@@ -17,10 +17,10 @@ class MultiboxTrainChain(chainer.Chain):
             mb_locs, mb_confs, gt_mb_locs, gt_mb_labels, self.k)
         loss = loc_loss * self.alpha + conf_loss
 
-        chainer.reporter.repot({
+        chainer.reporter.report({
             'loss': loss,
             'loss/loc': loc_loss,
-            'loss/conf:': conf_loss
+            'loss/conf': conf_loss
         }, self)
 
         return loss
