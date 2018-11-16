@@ -23,6 +23,7 @@ def main():
 
     train, test, train_gt, test_gt = load_train_test(
         train_dir=const.TRAIN_DIR, gt_dir=const.GT_DIR)
+    res.log_info(f'Train: {len(train)}, test: {len(test)}')
 
     model = ARCHS[args.model](n_fg_class=len(const.LABELS),
                               pretrained_model='imagenet')
@@ -36,12 +37,15 @@ def main():
         ISIC2018Task1Dataset(train, train_gt),
         Transform(model.coder, model.insize, model.mean)
     )
-    train_iter = chainer.iterators.MultiprocessIterator(train_dataset, args.batchsize)
+    train_iter = chainer.iterators.MultiprocessIterator(
+        train_dataset, args.batchsize, n_processes=args.loaderjob)
 
     test_dataset = TransformDataset(
         ISIC2018Task1Dataset(test, test_gt),
         Transform(model.coder, model.insize, model.mean))
-    test_iter = chainer.iterators.MultiprocessIterator(test_dataset, args.batchsize)
+    test_iter = chainer.iterators.MultiprocessIterator(
+        test_dataset, args.batchsize,
+        shuffle=False, repeat=False, n_processes=args.loaderjob)
 
     optimizer = chainer.optimizers.MomentumSGD()
     optimizer.setup(train_chain)
