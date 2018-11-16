@@ -7,6 +7,7 @@ Skin Lesion Detector using [HAM10000](https://arxiv.org/abs/1803.10417) dataset 
 - Python 3.6
 - Chainer 5.0
 - ChainerCV 0.11
+- cupy-cuda92 (recommended)
 
 ```shell
 $ pip install -r requirementx.txt
