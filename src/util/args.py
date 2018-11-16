@@ -9,5 +9,6 @@ def parse_args():
     parser.add_argument('--gpu', type=int, default=-1)
     parser.add_argument('--out', default='result')
     parser.add_argument('--resume', action='store_true', default=False)
+    parser.add_argument('--loaderjob', type=int, default=8)
 
     return parser.parse_args()
