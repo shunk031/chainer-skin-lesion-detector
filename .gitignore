@@ -2,6 +2,7 @@
 *.xml
 *.zip
 *.txt
+!requirements.txt
 *.jpg
 *.png
 
