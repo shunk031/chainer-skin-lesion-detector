@@ -1,4 +1,6 @@
+import argparse
 import xml.etree.ElementTree as ET
+from multiprocessing.pool import Pool
 from xml.dom import minidom
 
 from PIL import Image
@@ -7,8 +9,9 @@ from tqdm import tqdm
 from util import const
 
 
-def get_gt_fpaths():
-    return [fpath for fpath in const.GT_DIR.iterdir() if fpath.suffix == '.png']
+def get_fpaths(data_dir, suffix):
+    return [fpath for fpath in sorted(data_dir.iterdir(),
+                                      key=lambda x: x.name) if fpath.suffix == suffix]
 
 
 def make_voc_based_xml(folder_name, file_name, bbox):
@@ -52,8 +55,12 @@ def save_voc_based_xml(xml_file, xml_fpath):
         wf.write(xml_file)
 
 
-def get_bbox_from_image(gt_fpath):
-    return Image.open(str(gt_fpath)).convert('RGB').getbbox()
+def load_image(img_fpath):
+    return Image.open(str(img_fpath))
+
+
+def get_bbox_from_gt(gt):
+    return gt.convert('RGB').getbbox()
 
 
 def pretify_xml(elem):
@@ -64,20 +71,48 @@ def pretify_xml(elem):
     return reparsed.toprettyxml(indent='  ')
 
 
+def preprocess_image_and_gt(img_fpath, gt_fpath):
+
+    # rescale image
+    img = load_image(img_fpath)
+    img.thumbnail((const.MAX_SIZE, const.MAX_SIZE), Image.ANTIALIAS)
+    img.save(str(const.PREPROCESSED_TRAIN_DIR / img_fpath.name))
+
+    # rescale ground truth
+    gt = load_image(gt_fpath)
+    gt.thumbnail((const.MAX_SIZE, const.MAX_SIZE), Image.ANTIALIAS)
+    gt.save(str(const.PREPROCESSED_GT_DIR / gt_fpath.name))
+
+    # get bounding box from ground truth
+    bbox = get_bbox_from_gt(gt)
+    xml_file = make_voc_based_xml(
+        folder_name=gt_fpath.parent.name,
+        file_name=gt_fpath.name,
+        bbox=bbox,
+    )
+    xml_fpath = const.PREPROCESSED_GT_DIR / f'{gt_fpath.stem}.xml'
+    save_voc_based_xml(xml_file, xml_fpath)
+
+
+def wapper_preprocess_image_and_gt(args):
+    img_fpath, gt_fpath = args
+    preprocess_image_and_gt(img_fpath, gt_fpath)
+
+
 def main():
 
-    gt_fpaths = get_gt_fpaths()
-    for gt_fpath in tqdm(gt_fpaths):
-        bbox = get_bbox_from_image()
+    parser = argparse.ArgumentParser(description='make dataset for training')
+    parser.add_argument('--loaderjob', type=int, default=2)
+    args = parser.parse_args()
 
-        xml_file = make_voc_based_xml(
-            folder_name=gt_fpath.parent.name,
-            file_name=gt_fpath.name,
-            bbox=bbox
-        )
+    img_fpaths = get_fpaths(const.TRAIN_DIR, suffix='.jpg')
+    gt_fpaths = get_fpaths(const.GT_DIR, suffix='.png')
 
-        xml_fpath = gt_fpath.parent / f'{gt_fpath.stem}.xml'
-        save_voc_based_xml(xml_file, xml_fpath)
+    with Pool(processes=args.loaderjob) as pool:
+        with tqdm(total=len(img_fpaths)) as pbar:
+            for _ in tqdm(pool.imap(wapper_preprocess_image_and_gt,
+                                    zip(img_fpaths, gt_fpaths))):
+                pbar.update()
 
 
 if __name__ == '__main__':
