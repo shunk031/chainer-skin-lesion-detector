@@ -1,8 +1,12 @@
+import cv2  # NOQA # isort:skip
+cv2.setNumThreads(0)  # NOQA
+
+
 import chainer
 from chainer import training
 from chainer.datasets import TransformDataset
 from chainer.optimizer_hooks import WeightDecay
-from chainer.training import extensions, triggers
+from chainer.training import extensions
 from chainercv.extensions import DetectionVOCEvaluator
 from chainercv.links.model.ssd import GradientScaling
 
@@ -22,7 +26,8 @@ def main():
     res = Resource(args, train=True)
 
     train, test, train_gt, test_gt = load_train_test(
-        train_dir=const.TRAIN_DIR, gt_dir=const.GT_DIR)
+        train_dir=const.PREPROCESSED_TRAIN_DIR,
+        gt_dir=const.PREPROCESSED_GT_DIR)
     res.log_info(f'Train: {len(train)}, test: {len(test)}')
 
     model = ARCHS[args.model](n_fg_class=len(const.LABELS),
@@ -37,17 +42,17 @@ def main():
         ISIC2018Task1Dataset(train, train_gt),
         Transform(model.coder, model.insize, model.mean)
     )
-    train_iter = chainer.iterators.MultiprocessIterator(
-        train_dataset, args.batchsize, n_processes=args.loaderjob)
+    train_iter = chainer.iterators.MultithreadIterator(
+        train_dataset, args.batchsize, n_threads=args.loaderjob)
 
     test_dataset = TransformDataset(
         ISIC2018Task1Dataset(test, test_gt),
         Transform(model.coder, model.insize, model.mean))
-    test_iter = chainer.iterators.MultiprocessIterator(
-        test_dataset, args.batchsize,
-        shuffle=False, repeat=False, n_processes=args.loaderjob)
+    test_iter = chainer.iterators.MultithreadIterator(
+        test_dataset, args.batchsize, shuffle=False, repeat=False,
+        n_threads=args.loaderjob)
 
-    optimizer = chainer.optimizers.MomentumSGD()
+    optimizer = chainer.optimizers.Adam()
     optimizer.setup(train_chain)
     for param in train_chain.params():
         if param.name == 'b':
@@ -58,16 +63,16 @@ def main():
     updater = training.updaters.StandardUpdater(
         train_iter, optimizer, device=args.gpu)
     trainer = training.Trainer(updater, (120000, 'iteration'), args.out)
-    trainer.extend(
-        extensions.ExponentialShift('lr', 0.1, init=1e-3),
-        trigger=triggers.ManualScheduleTrigger([80000, 100000], 'iteration'))
+    # trainer.extend(
+    #     extensions.ExponentialShift('lr', 0.1, init=1e-3),
+    #     trigger=triggers.ManualScheduleTrigger([80000, 100000], 'iteration'))
     trainer.extend(
         DetectionVOCEvaluator(
             test_iter, model, use_07_metric=True,
             label_names=const.LABELS),
         trigger=(10000, 'iteration'))
 
-    log_interval = 10, 'iteration'
+    log_interval = 100, 'iteration'
     trainer.extend(extensions.LogReport(trigger=log_interval))
     trainer.extend(extensions.observe_lr(), trigger=log_interval)
     trainer.extend(extensions.PrintReport(
