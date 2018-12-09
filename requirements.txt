@@ -7,6 +7,7 @@ chainer==5.0.0
 chainercv==0.11.0
 chardet==3.0.4
 Click==7.0
+cupy-cuda90==5.1.0
 cycler==0.10.0
 decorator==4.3.0
 defusedxml==0.5.0
