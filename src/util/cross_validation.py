@@ -12,10 +12,8 @@ def load_train_test(train_dir, gt_dir):
     img_fpaths = load_dataset_fpaths(train_dir, suffix='.jpg')
     gt_fpaths = load_dataset_fpaths(gt_dir, suffix='.xml')
 
-    # import pdb
-    # pdb.set_trace()
-
-    assert len(img_fpaths) == len(gt_fpaths)
+    assert len(img_fpaths) == len(gt_fpaths), \
+        f'# of image: {len(img_fpaths)} != # of ground truth: {len(gt_fpaths)}'
 
     return isic_task1_train_test_split(img_fpaths, gt_fpaths)
 

@@ -10,7 +10,8 @@ from util import const
 class ISIC2018Task1Dataset(chainer.dataset.DatasetMixin):
 
     def __init__(self, img_fpaths, gt_fpaths):
-        assert len(img_fpaths) == len(gt_fpaths)
+        assert len(img_fpaths) == len(gt_fpaths), \
+            f'# of image: {len(img_fpaths)} != # of ground truth: {len(gt_fpaths)}'
         self.annotations = self.load_annotations(img_fpaths, gt_fpaths)
 
     def load_annotations(self, img_fpaths, gt_fpaths):
