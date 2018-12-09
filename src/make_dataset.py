@@ -10,12 +10,17 @@ from util import const
 
 
 def get_fpaths(data_dir, suffix):
+    """
+    Get the all full path of all files with suffix in `data_dir`
+    """
     return [fpath for fpath in sorted(data_dir.iterdir(),
                                       key=lambda x: x.name) if fpath.suffix == suffix]
 
 
 def make_voc_based_xml(folder_name, file_name, bbox):
-
+    """
+    Make VOC based XML string
+    """
     left, upper, right, lower = bbox
     annotation = ET.Element('annotation')
 
@@ -49,22 +54,32 @@ def make_voc_based_xml(folder_name, file_name, bbox):
 
 
 def save_voc_based_xml(xml_file, xml_fpath):
-
+    """
+    Save VOC based XML file
+    """
     xml_file = pretify_xml(xml_file)
     with xml_fpath.open('w') as wf:
         wf.write(xml_file)
 
 
 def load_image(img_fpath):
+    """
+    Load image from `img_fpath`
+    """
     return Image.open(str(img_fpath))
 
 
 def get_bbox_from_gt(gt):
+    """
+    Get bounding box from ground truth image
+    """
     return gt.convert('RGB').getbbox()
 
 
 def pretify_xml(elem):
-
+    """
+    Pretify XML string
+    """
     rough_string = ET.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
 
