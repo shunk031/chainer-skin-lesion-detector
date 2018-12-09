@@ -12,6 +12,9 @@ GT_DIR = DATA_DIR / 'ISIC2018_Task1_Training_GroundTruth'
 # /data/ISIC2018_Task1-2_Training_Input
 TRAIN_DIR = DATA_DIR / 'ISIC2018_Task1-2_Training_Input'
 
+# /data/xml
+XML_DIR = DATA_DIR / 'xml'
+
 # /data/preprocessed
 PREPROCESSED_DIR = DATA_DIR / 'preprocessed'
 

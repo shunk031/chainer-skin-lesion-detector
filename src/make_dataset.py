@@ -90,7 +90,7 @@ def preprocess_image_and_gt(img_fpath, gt_fpath):
         file_name=gt_fpath.name,
         bbox=bbox,
     )
-    xml_fpath = const.PREPROCESSED_GT_DIR / f'{gt_fpath.stem}.xml'
+    xml_fpath = const.XML_DIR / f'{gt_fpath.stem}.xml'
     save_voc_based_xml(xml_file, xml_fpath)
 
 
