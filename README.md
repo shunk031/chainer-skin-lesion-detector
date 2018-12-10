@@ -7,7 +7,7 @@ Skin Lesion Detector using [HAM10000](https://arxiv.org/abs/1803.10417) dataset 
 - Python 3.6
 - Chainer 5.0
 - ChainerCV 0.11
-- cupy-cuda92 (recommended)
+- cupy-cuda90
 - opencv 3.4
 
 ```shell
@@ -51,6 +51,8 @@ $ docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia -
 ```shell
 $ python make_dataset.py --loaderjob 4
 ```
+
+An example of annotation data with a bounding box from the ground truth of segmentation using ISIC2018 task1 dataset.
 
 ## Train
 - You can specify model, number of batch size, number of epoch, GPU ID and number of parallel data loading process.
