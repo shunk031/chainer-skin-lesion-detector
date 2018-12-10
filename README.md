@@ -46,6 +46,7 @@ $ docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia -
 ## Preprocess
 
 - Re-scale image and ground truth
+- Make bounding box from ground truth of segmentation image
 - Create VOC format based label to `data/xml` directory
 
 ```shell
