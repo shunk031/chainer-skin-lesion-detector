@@ -5,7 +5,7 @@
 !requirements.txt
 *.jpg
 *.png
-
+!.github/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
