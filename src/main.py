@@ -1,12 +1,11 @@
 import cv2  # NOQA # isort:skip
 cv2.setNumThreads(0)  # NOQA
 
-
 import chainer
 from chainer import training
 from chainer.datasets import TransformDataset
 from chainer.optimizer_hooks import WeightDecay
-from chainer.training import extensions
+from chainer.training import extensions, triggers
 from chainercv.extensions import DetectionVOCEvaluator
 from chainercv.links.model.ssd import GradientScaling
 
@@ -27,12 +26,12 @@ def main():
 
     train, test, train_gt, test_gt = load_train_test(
         train_dir=const.PREPROCESSED_TRAIN_DIR,
-        gt_dir=const.PREPROCESSED_GT_DIR)
+        gt_dir=const.XML_DIR)
     res.log_info(f'Train: {len(train)}, test: {len(test)}')
 
     model = ARCHS[args.model](n_fg_class=len(const.LABELS),
                               pretrained_model='imagenet')
-    model.use_preset('evaluate')
+    # model.use_preset('evaluate')
     train_chain = MultiboxTrainChain(model)
     if args.gpu >= 0:
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -62,30 +61,28 @@ def main():
 
     updater = training.updaters.StandardUpdater(
         train_iter, optimizer, device=args.gpu)
-    trainer = training.Trainer(updater, (120000, 'iteration'), args.out)
-    # trainer.extend(
-    #     extensions.ExponentialShift('lr', 0.1, init=1e-3),
-    #     trigger=triggers.ManualScheduleTrigger([80000, 100000], 'iteration'))
+    trainer = training.Trainer(updater, (args.epoch, 'epoch'), args.out)
     trainer.extend(
         DetectionVOCEvaluator(
-            test_iter, model, use_07_metric=True,
-            label_names=const.LABELS),
-        trigger=(10000, 'iteration'))
+            test_iter, model, use_07_metric=False,
+            label_names=const.LABELS))
 
-    log_interval = 100, 'iteration'
-    trainer.extend(extensions.LogReport(trigger=log_interval))
-    trainer.extend(extensions.observe_lr(), trigger=log_interval)
-    trainer.extend(extensions.PrintReport(
-        ['epoch', 'iteration', 'lr',
-         'main/loss', 'main/loss/loc', 'main/loss/conf',
-         'validation/main/map']),
-        trigger=log_interval)
+    trainer.extend(extensions.LogReport())
+    trainer.extend(extensions.observe_lr())
+    trainer.extend(extensions.PrintReport([
+        'epoch', 'iteration',
+        'main/loss', 'main/loss/loc', 'main/loss/conf',
+        'validation/main/map']))
     trainer.extend(extensions.ProgressBar(update_interval=10))
 
-    trainer.extend(extensions.snapshot(), trigger=(10000, 'iteration'))
-    trainer.extend(
-        extensions.snapshot_object(model, 'model_iter_{.updater.iteration}'),
-        trigger=(120000, 'iteration'))
+    snapshot_trigger = triggers.MaxValueTrigger(
+        key='validation/main/map')
+    snapshot_object_trigger = triggers.MaxValueTrigger(
+        key='validation/main/map')
+    trainer.extend(extensions.snapshot(filename='snapshot_best.npz'),
+                   trigger=snapshot_trigger)
+    trainer.extend(extensions.snapshot_object(model, 'model_best.npz'),
+                   trigger=snapshot_object_trigger)
 
     if args.resume:
         chainer.serializers.load_npz(args.resume, trainer)
