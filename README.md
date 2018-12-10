@@ -52,7 +52,9 @@ $ docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia -
 $ python make_dataset.py --loaderjob 4
 ```
 
-An example of annotation data with a bounding box from the ground truth of segmentation using ISIC2018 task1 dataset.
+An example of annotation data with a bounding box from the ground truth of segmentation using ISIC2018 task1 dataset:
+
+![](https://raw.githubusercontent.com/shunk031/chainer-skin-lesion-detector/master/.github/ground_truth_segmentation_with_bbox.png)
 
 ## Train
 - You can specify model, number of batch size, number of epoch, GPU ID and number of parallel data loading process.
