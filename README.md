@@ -21,6 +21,25 @@ $ docker build -t chainer-skin-lesion-detector .
 $ docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia --name chainer-skin-lesion-detector-dev chainer-skin-lesion-detector /bin/bash
 ```
 
+## Directory architecture
+```
+.
+├── data
+│   ├── ISIC2018_Task1-2_Training_Input
+│   ├── ISIC2018_Task1_Training_GroundTruth
+│   ├── preprocessed
+│   │   ├── ground_truth
+│   │   └── input
+│   └── xml
+└── src
+    ├── models
+    │
+    ├── notebooks
+    │
+    ├── result
+    └── util
+```
+
 ## Download dataset
 - Download training dataset and ground truth data from [Task 1: Training | ISIC 2018](https://challenge2018.isic-archive.com/task1/training/) to `data/` directory
 
