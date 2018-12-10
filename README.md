@@ -17,8 +17,8 @@ $ pip install -r requirementx.txt
 ## Setup environment using Docker
 
 ```
-docker build -t chainer-skin-lesion-detector .
-docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia --name chainer-skin-lesion-detector-dev chainer-skin-lesion-detector /bin/bash
+$ docker build -t chainer-skin-lesion-detector .
+$ docker run --rm -it -v $(pwd):/chainer-skin-lesion-detector --runtime nvidia --name chainer-skin-lesion-detector-dev chainer-skin-lesion-detector /bin/bash
 ```
 
 ## Download dataset
@@ -39,6 +39,11 @@ $ python make_dataset.py --loaderjob 4
 $ python main.py --model ssd300 --batchsize 32 --epoch 30 --gpu 0 --loaderjob 4
 ```
 
+## Evaluation
+
+### Example of model prediction
+
 ## Reference
 
 - [Tschandl, Philipp, Cliff Rosendahl, and Harald Kittler. "The HAM10000 Dataset: A Large Collection of Multi-Source Dermatoscopic Images of Common Pigmented Skin Lesions." arXiv preprint arXiv:1803.10417 (2018).](https://arxiv.org/abs/1803.10417)
+- [Liu, Wei and Anguelov, Dragomir and Erhan, Dumitru and Szegedy, Christian and Reed, Scott and Fu, Cheng-Yang and Berg, Alexander C. "SSD: Single shot multibox detector." 14th European Conference on Computer Vision, ECCV 2016. Springer Verlag, 2016.](https://arxiv.org/abs/1512.02325)
