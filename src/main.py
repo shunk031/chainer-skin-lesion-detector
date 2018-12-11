@@ -1,5 +1,6 @@
 import cv2  # NOQA # isort:skip
 cv2.setNumThreads(0)  # NOQA
+import os
 
 import chainer
 from chainer import training
@@ -31,7 +32,7 @@ def main():
 
     model = ARCHS[args.model](n_fg_class=len(const.LABELS),
                               pretrained_model='imagenet')
-    # model.use_preset('evaluate')
+    model.use_preset('evaluate')
     train_chain = MultiboxTrainChain(model)
     if args.gpu >= 0:
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -88,6 +89,12 @@ def main():
         chainer.serializers.load_npz(args.resume, trainer)
 
     trainer.run()
+
+    # save last model
+    chainer.serializers.save_npz(
+        os.path.join(args.out, 'snapshot_last.npz'), trainer)
+    chainer.serializers.save_npz(
+        os.path.join(args.out, 'model_last.npz'), model)
 
 
 if __name__ == '__main__':
