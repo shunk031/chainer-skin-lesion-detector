@@ -41,6 +41,16 @@ class ISIC2018Task1Dataset(chainer.dataset.DatasetMixin):
         return len(self.annotations)
 
     def get_example(self, i):
+        """Returns the i-th example.
+
+        Args:
+            i (int): The index of the example.
+        Returns:
+            (img, bbox, label) (tuple): Return arrays with the following shape
+            img: (ch, h, w)
+            bbox: (num bboxes, (ymin, xmin, ymax, xmax))
+            label: (num labels, )
+        """
 
         img_fpath, anno_dict = self.annotations[i]
         img = read_image(str(img_fpath), color=True)
