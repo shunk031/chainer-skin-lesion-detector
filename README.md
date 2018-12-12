@@ -1,5 +1,7 @@
 # Chainer Skin Lesion Detector
 
+[![MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/shunk031/chainer-skin-lesion-detector/blob/master/LICENSE)
+
 Skin Lesion Detector using [HAM10000](https://arxiv.org/abs/1803.10417) dataset with [Chainer](https://chainer.org/)
 
 ## Requirements
