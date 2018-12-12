@@ -67,6 +67,8 @@ $ python main.py --model ssd300 --batchsize 32 --epoch 30 --gpu 0 --loaderjob 4
 
 ### Example of model prediction
 
+![](https://raw.githubusercontent.com/shunk031/chainer-skin-lesion-detector/master/.github/example_of_model_prediction.png)
+
 ## Reference
 
 - [Tschandl, Philipp, Cliff Rosendahl, and Harald Kittler. "The HAM10000 Dataset: A Large Collection of Multi-Source Dermatoscopic Images of Common Pigmented Skin Lesions." arXiv preprint arXiv:1803.10417 (2018).](https://arxiv.org/abs/1803.10417)
