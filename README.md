@@ -13,7 +13,7 @@ Skin Lesion Detector using [HAM10000](https://arxiv.org/abs/1803.10417) dataset 
 - opencv 3.4
 
 ```shell
-$ pip install -r requirementx.txt
+$ pip install -r requirements.txt
 ```
 
 ## Setup environment using Docker
